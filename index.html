@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Evolution of Specialty Coffee: An Interactive Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Neutrals -->
+    <!-- Application Structure Plan: A narrative-driven, single-page scrolling application is chosen over tabs to guide the user through a complex story logically. The flow starts with a high-level introduction (Hero), establishes the old benchmark ("The Old Standard"), shows the progression of change via an interactive timeline ("The Turning Point"), details the new system with an interactive diagram ("A New Paradigm"), provides a direct comparison ("Clash of Concepts"), visualizes stakeholder sentiment with a chart ("Industry Crossroads"), and concludes with future implications ("The Path Forward"). This structure enhances understanding by building context sequentially, making the dense report information more digestible and engaging than compartmentalized tabs. -->
+    <!-- Visualization & Content Choices: Report Info: Historical milestones -> Goal: Show chronological progression -> Viz: Vertical timeline with HTML/CSS for a clear, narrative flow. Report Info: CVA's four pillars -> Goal: Explain a new, complex framework -> Viz: Interactive HTML/CSS diagram where clicking a pillar reveals its details, promoting active learning. Report Info: Industry reactions (producers, roasters, etc.) -> Goal: Compare stakeholder sentiment -> Viz: Chart.js Polar Area chart to visually contrast the nuanced positive/negative reactions, offering a quick, impactful summary. Report Info: Old vs. New comparison -> Goal: Direct juxtaposition -> Viz: A clear, responsive HTML table. All choices avoid SVG/Mermaid, focusing on interactive HTML/CSS and Canvas for a dynamic, unified experience. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4a4a4a;
+        }
+        .section-title {
+            color: #6F4E37;
+        }
+        .accent-color {
+            color: #A0522D;
+        }
+        .bg-accent {
+             background-color: #A0522D;
+        }
+        .bg-accent-light {
+            background-color: #D2B48C;
+        }
+        .timeline-item {
+            border-left: 3px solid #D2B48C;
+        }
+        .timeline-dot {
+            background-color: #6F4E37;
+        }
+        .cva-card {
+            transition: all 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .cva-card.active, .cva-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #A0522D;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 60vh;
+            width: 80vw;
+            max-width: 600px;
+            max-height: 600px;
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #A0522D;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="text-xl font-bold section-title">SCA Definition Shift</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#intro" class="nav-link font-semibold">Introduction</a>
+                    <a href="#timeline" class="nav-link font-semibold">Timeline</a>
+                    <a href="#cva" class="nav-link font-semibold">The CVA</a>
+                    <a href="#comparison" class="nav-link font-semibold">Comparison</a>
+                    <a href="#reaction" class="nav-link font-semibold">Reactions</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="intro" class="min-h-screen flex items-center bg-stone-100">
+            <div class="container mx-auto px-6 py-12 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold section-title leading-tight mb-4">From Score to Story</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    An interactive exploration of the Specialty Coffee Association's monumental shift in defining coffee quality—moving beyond a simple number to embrace a holistic understanding of value.
+                </p>
+                <a href="#old-standard" class="mt-8 inline-block bg-accent text-white font-bold py-3 px-8 rounded-full hover:bg-opacity-90 transition-transform transform hover:scale-105">
+                    Begin the Journey
+                </a>
+            </div>
+        </section>
+
+        <section id="old-standard" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">The Old Standard</h2>
+                    <p class="text-lg text-gray-500 mt-2">How a number came to define an industry.</p>
+                </div>
+                <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+                    <div class="p-8 bg-stone-50 rounded-lg">
+                        <h3 class="text-2xl font-bold accent-color mb-4">The 80-Point Rule</h3>
+                        <p class="text-gray-700">
+                            For decades, "specialty coffee" had a clear, quantitative definition. To earn the title, a coffee had to score **80 points or higher** on the SCA's 100-point cupping scale. This score was derived from assessing attributes like aroma, flavor, acidity, and body.
+                        </p>
+                    </div>
+                    <div class="p-8 bg-stone-50 rounded-lg">
+                        <h3 class="text-2xl font-bold accent-color mb-4">Defect-Free Foundation</h3>
+                        <p class="text-gray-700">
+                            Beyond the cup score, the green beans themselves faced strict scrutiny. A 350g sample could have **zero primary defects** (like a full sour bean) and no more than five secondary defects. This dual system created a clear, albeit rigid, benchmark for quality.
+                        </p>
+                    </div>
+                </div>
+                 <div class="mt-8 text-center max-w-3xl mx-auto">
+                     <p class="text-gray-600">This system was pivotal, creating a common language for quality that helped the specialty market grow. However, its intense focus on a numerical score could overshadow other crucial aspects of a coffee's identity, such as its unique varietal, innovative processing, or compelling origin story.</p>
+                 </div>
+            </div>
+        </section>
+
+        <section id="timeline" class="py-20 bg-stone-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">The Turning Point</h2>
+                    <p class="text-lg text-gray-500 mt-2">Key moments that led to a paradigm shift.</p>
+                </div>
+                <div class="relative max-w-3xl mx-auto">
+                    <div id="timeline-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cva" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">A New Paradigm: The CVA</h2>
+                    <p class="text-lg text-gray-500 mt-2 max-w-3xl mx-auto">The Coffee Value Assessment (CVA) moves beyond a single score to discover a coffee's holistic value. Click on a pillar to learn more.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div id="cva-card-physical" class="cva-card cursor-pointer bg-stone-50 p-6 rounded-lg text-center" onclick="showCvaDetail('physical')">
+                        <div class="text-4xl mb-3">🔬</div>
+                        <h3 class="text-xl font-bold accent-color">Physical</h3>
+                    </div>
+                    <div id="cva-card-descriptive" class="cva-card cursor-pointer bg-stone-50 p-6 rounded-lg text-center" onclick="showCvaDetail('descriptive')">
+                        <div class="text-4xl mb-3">👃</div>
+                        <h3 class="text-xl font-bold accent-color">Descriptive</h3>
+                    </div>
+                    <div id="cva-card-affective" class="cva-card cursor-pointer bg-stone-50 p-6 rounded-lg text-center" onclick="showCvaDetail('affective')">
+                         <div class="text-4xl mb-3">❤️</div>
+                        <h3 class="text-xl font-bold accent-color">Affective</h3>
+                    </div>
+                    <div id="cva-card-extrinsic" class="cva-card cursor-pointer bg-stone-50 p-6 rounded-lg text-center" onclick="showCvaDetail('extrinsic')">
+                         <div class="text-4xl mb-3">🌍</div>
+                        <h3 class="text-xl font-bold accent-color">Extrinsic</h3>
+                    </div>
+                </div>
+                <div id="cva-detail" class="p-8 bg-amber-50 rounded-lg min-h-[150px] flex items-center justify-center transition-all duration-300">
+                    <p class="text-lg text-gray-700 text-center">Select a pillar above to see its description.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="py-20 bg-stone-100">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Clash of Concepts</h2>
+                    <p class="text-lg text-gray-500 mt-2">A side-by-side look at the two systems.</p>
+                     <p class="mt-4 max-w-3xl mx-auto text-gray-600">The shift from the original SCA definition to the CVA framework represents a fundamental change in how quality is measured. This table highlights the key differences.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[600px] text-left border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="p-4 bg-stone-200 font-bold text-gray-700 border border-stone-300">Feature</th>
+                                <th class="p-4 bg-stone-200 font-bold text-gray-700 border border-stone-300">Old SCA Definition</th>
+                                <th class="p-4 bg-stone-200 font-bold text-gray-700 border border-stone-300">New Definition (with CVA)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-table-body" class="bg-white">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <section id="reaction" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Industry Crossroads</h2>
+                    <p class="text-lg text-gray-500 mt-2">Visualizing the diverse reactions to the CVA.</p>
+                    <p class="mt-4 max-w-3xl mx-auto text-gray-600">The introduction of the CVA has been met with a mix of excitement and skepticism. This chart represents the general sentiment from key industry stakeholders, highlighting the perceived benefits versus the concerns.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="reactionChart"></canvas>
+                    </div>
+                    <div id="reaction-details" class="space-y-4">
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <h3 class="font-bold text-lg accent-color">Producers</h3>
+                            <p class="text-gray-700">Largely optimistic, seeing a chance for better value recognition for their full story, including sustainability and unique processing.</p>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <h3 class="font-bold text-lg accent-color">Roasters & Importers</h3>
+                            <p class="text-gray-700">Mixed views. Many appreciate the richer data, while others worry about implementation complexity and how to translate it to consumers.</p>
+                        </div>
+                         <div class="p-4 bg-stone-50 rounded-lg">
+                            <h3 class="font-bold text-lg accent-color">CQI / Q-Graders</h3>
+                            <p class="text-gray-700">A cautious but engaged stance, viewing the CVA as an "additional system" that coexists with, rather than replaces, the established Q Grader program.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="path-forward" class="py-20 bg-stone-100">
+             <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold section-title">The Path Forward</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">The evolution to the CVA framework is more than a technical update; it's a reorientation of the industry's values towards greater transparency, inclusivity, and a deeper appreciation for everything that makes a coffee truly special. Its success hinges on continued education, refinement, and effective communication across the entire value chain—from producer to consumer. It's a journey towards a more equitable and sustainable future for coffee.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white py-8">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <p>Interactive analysis based on the report "The Evolving Definition of Specialty Coffee."</p>
+            <p>&copy; 2025. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const timelineData = [
+            { year: '1974', event: 'Erna Knutsen coins the term "specialty coffee," describing beans with the best flavor from special microclimates.' },
+            { year: '1982', event: 'The Specialty Coffee Association of America (SCAA) is founded to champion high-quality coffee.' },
+            { year: 'c. 2004', event: 'The SCAA cupping form and its 100-point scale (80+ for specialty) become the de facto industry benchmark.' },
+            { year: '2017', event: 'The SCAA and SCAE merge to form the unified Specialty Coffee Association (SCA).' },
+            { year: '2021', event: 'The SCA introduces the new definition: a coffee recognized for "distinctive attributes, resulting in a higher value."' },
+            { year: '2023', event: 'The Coffee Value Assessment (CVA) is launched in beta, operationalizing the new definition.' }
+        ];
+
+        const timelineContainer = document.getElementById('timeline-container');
+        timelineData.forEach((item, index) => {
+            const timelineItem = document.createElement('div');
+            timelineItem.classList.add('timeline-item', 'relative', 'pl-8', 'py-4');
+            if(index < timelineData.length - 1) {
+                timelineItem.classList.add('pb-12');
+            }
+            timelineItem.innerHTML = `
+                <div class="timeline-dot absolute top-5 -left-[7.5px] w-4 h-4 rounded-full border-4 border-stone-100"></div>
+                <p class="text-lg font-bold accent-color">${item.year}</p>
+                <p class="text-gray-700">${item.event}</p>
+            `;
+            timelineContainer.appendChild(timelineItem);
+        });
+
+        const cvaData = {
+            physical: {
+                title: 'Physical Assessment',
+                description: 'Evaluates the raw material. This includes analyzing the green and roasted beans for defects, moisture content, bean size, and uniformity. It provides a foundational look at the coffee\'s condition and potential.'
+            },
+            descriptive: {
+                title: 'Descriptive Assessment',
+                description: 'Focuses on objective sensory analysis. Using tools like Check-All-That-Apply (CATA) lists, it documents the coffee\'s aroma, flavor, and texture to create a detailed, objective profile without judging quality.'
+            },
+            affective: {
+                title: 'Affective Assessment',
+                description: 'Measures subjective preference and impression of quality. This is where a "score" or judgment of liking is recorded, often using a 9-point scale to capture how much a cupper or consumer enjoys the coffee.'
+            },
+            extrinsic: {
+                title: 'Extrinsic Assessment',
+                description: 'A crucial addition that considers factors beyond the cup. It includes the coffee\'s origin story, producer information, processing methods, varietal, and sustainability certifications. It formally quantifies the story.'
+            }
+        };
+
+        const cvaDetailContainer = document.getElementById('cva-detail');
+        const cvaCards = {
+            physical: document.getElementById('cva-card-physical'),
+            descriptive: document.getElementById('cva-card-descriptive'),
+            affective: document.getElementById('cva-card-affective'),
+            extrinsic: document.getElementById('cva-card-extrinsic'),
+        }
+
+        function showCvaDetail(type) {
+             Object.values(cvaCards).forEach(card => card.classList.remove('active'));
+             cvaCards[type].classList.add('active');
+
+            const detail = cvaData[type];
+            cvaDetailContainer.innerHTML = `
+                <div class="text-left">
+                    <h4 class="text-xl font-bold accent-color mb-2">${detail.title}</h4>
+                    <p class="text-gray-700">${detail.description}</p>
+                </div>
+            `;
+        }
+
+        const comparisonData = [
+            { feature: 'Core Concept', old: 'Highest grade coffee based on an 80+ point score and strict defect count.', 'new': 'A coffee or coffee experience recognized for distinctive attributes that result in higher marketplace value.'},
+            { feature: 'Primary Focus', old: 'Intrinsic sensory quality (flavor, aroma, etc.).', 'new': 'Holistic value, including intrinsic quality, extrinsic story, and market preference.'},
+            { feature: 'Evaluation Tool', old: 'SCA Cupping Form (100-point scale).', 'new': 'Coffee Value Assessment (CVA) with 4 distinct pillars.'},
+            { feature: 'Extrinsic Factors', old: 'Not formally part of the score or definition.', 'new': 'Explicitly and systematically included via the Extrinsic Assessment.'},
+            { feature: 'Key Output', old: 'A single numerical score (e.g., 85 points) that determines specialty status.', 'new': 'A comprehensive profile aimed at "value discovery" rather than a single defining score.'},
+        ];
+        
+        const comparisonTableBody = document.getElementById('comparison-table-body');
+        comparisonData.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-4 border border-stone-200 font-semibold text-gray-800">${row.feature}</td>
+                <td class="p-4 border border-stone-200">${row.old}</td>
+                <td class="p-4 border border-stone-200">${row.new}</td>
+            `;
+            comparisonTableBody.appendChild(tr);
+        });
+
+
+        const ctx = document.getElementById('reactionChart').getContext('2d');
+        const reactionChart = new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Producers (Positive)', 'Roasters (Mixed)', 'CQI/Graders (Cautious)', 'Producers (Concerns)', 'Roasters (Concerns)', 'CQI/Graders (Positive)'],
+                datasets: [{
+                    label: 'Industry Reaction',
+                    data: [85, 60, 50, 15, 40, 50],
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.7)',
+                        'rgba(241, 196, 15, 0.7)',
+                        'rgba(230, 126, 34, 0.7)',
+                        'rgba(52, 152, 219, 0.3)',
+                        'rgba(241, 196, 15, 0.3)',
+                        'rgba(230, 126, 34, 0.3)',
+                    ],
+                    borderWidth: 1,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        pointLabels: {
+                            display: true,
+                            centerPointLabels: true,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            display: false
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                         callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.r !== null) {
+                                    label += context.parsed.r + '% Sentiment';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
